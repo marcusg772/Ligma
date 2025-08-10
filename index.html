@@ -7,370 +7,267 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mary vs Marcus">
 <link rel="apple-touch-icon" href="icon.png">
-<title>Mary vs Marcus — Visual Duel</title>
+<title>Mary vs Marcus — Multiplayer</title>
 <style>
-  :root{
-    --bg:#0f1724; --panel:#0b1220; --accent:#E6C07B; --good:#5DD39E; --bad:#FF6B6B;
-    --muted:#95A1B3; --card:#0f1724cc;
-  }
-  body{
-    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-    background: linear-gradient(180deg,#071029 0%, #0b1730 100%); color:#E6EEF8;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
-  .wrap{
-    max-width:720px; margin:0 auto; padding:18px;
-  }
-  header{ text-align:center; margin-bottom:8px; }
-  h1{ font-size:20px; margin:6px 0; letter-spacing:0.6px; }
-  .arena{
-    background: radial-gradient(circle at 10% 10%, #0f2a4a40, transparent 30%), rgba(255,255,255,0.02);
-    border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:12px;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.6); backdrop-filter: blur(6px);
-  }
-
-  .fighters{
-    display:flex; gap:12px; align-items:center; justify-content:space-between;
-    flex-wrap:wrap;
-  }
-  .fighter{
-    flex:1 1 46%; min-width:160px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:10px; padding:10px; display:flex; gap:10px; align-items:center;
-    border:1px solid rgba(255,255,255,0.03);
-    position:relative;
-  }
-  .portrait{ width:84px; height:84px; flex:0 0 84px; display:flex; align-items:center; justify-content:center; }
-  .details{ flex:1; min-width:0; }
-  .name{ font-weight:700; font-size:16px; margin-bottom:6px;}
-  .hpbar{ height:12px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden; }
-  .hpfill{ height:100%; width:100%; background:linear-gradient(90deg,var(--good), #3fbf9a); transform-origin:left; transition:width 500ms ease; }
-  .hptext{ font-size:12px; color:var(--muted); margin-top:6px; }
-  .vs{ text-align:center; font-weight:700; color:var(--muted); margin:6px 0; }
-
-  .log{
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
-    padding:10px; border-radius:8px; min-height:72px; font-size:15px;
-    border:1px solid rgba(255,255,255,0.02);
-  }
-  .controls{
-    display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;
-  }
-  .btn{
-    flex:1 1 48%; min-width:120px; padding:12px 10px; border-radius:10px; border:none; font-weight:700;
-    color:#02101a; background:var(--accent); font-size:15px; box-shadow: 0 6px 12px rgba(0,0,0,0.35);
-    touch-action: manipulation;
-  }
-  .btn.secondary{ background:transparent; color:var(--accent); border:1px solid rgba(230,192,123,0.12); }
-  .small{ font-size:13px; padding:9px; }
-
-  /* animations */
-  .shake { animation: shake 420ms linear; }
-  @keyframes shake {
-    0% { transform: translateX(0) }
-    20% { transform: translateX(-6px) }
-    40% { transform: translateX(6px) }
-    60% { transform: translateX(-4px) }
-    80% { transform: translateX(4px) }
-    100% { transform: translateX(0) }
-  }
-  .flash { animation: flash 380ms linear; }
-  @keyframes flash {
-    0% { box-shadow:0 0 0px rgba(255,255,255,0) }
-    50% { box-shadow:0 0 18px rgba(255,255,255,0.12) }
-    100% { box-shadow:0 0 0px rgba(255,255,255,0) }
-  }
-
-  footer{ margin-top:12px; text-align:center; color:var(--muted); font-size:13px; }
-  @media (max-width:420px){
-    .btn{ flex-basis:100% }
-    .fighter{ flex-basis:100% }
-    .portrait{ width:64px; height:64px; }
-  }
+:root{--bg:#071028;--accent:#E6C07B;--muted:#95A1B3}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#071028;color:#E6EEF8;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:16px}
+.container{max-width:720px;width:100%}
+.header{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:18px;margin:0}
+.panel{background:linear-gradient(180deg,#081427,#071022);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);margin-top:12px}
+.input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;margin-bottom:8px}
+.row{display:flex;gap:8px}
+.btn{flex:1;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#02101a;font-weight:800}
+.small{font-size:13px;color:var(--muted)}
+.center{text-align:center}
+.log{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;margin-top:10px;min-height:72px}
+.playerLabel{font-weight:700;margin-bottom:6px}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Mary vs Marcus — The Amulet Duel</h1>
-      <div style="color:var(--muted); font-size:13px;">Tap actions to play — works in Safari on iPhone</div>
-    </header>
-
-    <section class="arena" role="application" aria-label="Battle arena">
-      <div class="fighters">
-        <div id="mary" class="fighter" aria-live="polite">
-          <div class="portrait" id="maryPortrait" aria-hidden="true">
-            <!-- simple avatar SVG -->
-            <svg viewBox="0 0 120 120" width="84" height="84" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="gM" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#77D6B8"/>
-                  <stop offset="1" stop-color="#2FA27B"/>
-                </linearGradient>
-              </defs>
-              <circle cx="60" cy="60" r="56" fill="url(#gM)"/>
-              <circle cx="60" cy="44" r="20" fill="#04242b"/>
-              <rect x="28" y="72" width="84" height="30" rx="12" fill="#04242b"/>
-              <text x="60" y="72" text-anchor="middle" fill="#E6EEF8" font-size="22" font-weight="700" dy="8">M</text>
-            </svg>
-          </div>
-          <div class="details">
-            <div class="name">Mary • The Adventurer</div>
-            <div class="hpbar" aria-hidden="true"><div id="maryHpFill" class="hpfill"></div></div>
-            <div class="hptext" id="maryHpText">HP: 100 / 100</div>
-          </div>
-        </div>
-
-        <div class="vs">VS</div>
-
-        <div id="marcus" class="fighter" aria-live="polite">
-          <div class="portrait" id="marcusPortrait" aria-hidden="true">
-            <svg viewBox="0 0 120 120" width="84" height="84" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="gR" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#FF9A9E"/>
-                  <stop offset="1" stop-color="#FF6B6B"/>
-                </linearGradient>
-              </defs>
-              <circle cx="60" cy="60" r="56" fill="url(#gR)"/>
-              <circle cx="60" cy="44" r="20" fill="#2b1010"/>
-              <rect x="28" y="72" width="84" height="30" rx="12" fill="#2b1010"/>
-              <text x="60" y="72" text-anchor="middle" fill="#FFEFEF" font-size="22" font-weight="700" dy="8">Ma</text>
-            </svg>
-          </div>
-          <div class="details">
-            <div class="name">Marcus • The Rival</div>
-            <div class="hpbar" aria-hidden="true"><div id="marcusHpFill" class="hpfill" style="background:linear-gradient(90deg,#ff8a8a,#ff5a5a)"></div></div>
-            <div class="hptext" id="marcusHpText">HP: 100 / 100</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="log" id="log" role="status" aria-live="polite">The crowd hums with anticipation. Choose Mary’s action.</div>
-
-      <div class="controls" id="controls">
-        <button class="btn" id="attackBtn">Strike ⚔️</button>
-        <button class="btn" id="skillBtn">Skill Contest 🏹</button>
-        <button class="btn secondary" id="trickBtn">Trick 🪄</button>
-        <button class="btn secondary small" id="restartBtn">Restart</button>
-      </div>
-    </section>
-
-    <footer>Tip: Tap the buttons — sound is generated in-browser. Works offline once opened.</footer>
+<div class="container">
+  <div class="header">
+    <h1>Mary vs Marcus — Multiplayer</h1>
+    <div class="small">Use a room code to play</div>
   </div>
 
+  <div class="panel" id="lobby">
+    <div class="small">Create a new room or join an existing one. Share the 6-digit room code with your friend.</div>
+    <input id="nameInput" class="input" placeholder="Your name (e.g. Mary)" value="Mary"/>
+    <div class="row">
+      <button id="createBtn" class="btn">Create Room</button>
+      <button id="joinBtn" class="btn">Join Room</button>
+    </div>
+    <input id="roomInput" class="input" placeholder="Enter room code (e.g. 123456)"/>
+    <div class="log" id="lobbyLog">No room yet.</div>
+  </div>
+
+  <div class="panel" id="gamePanel" style="display:none">
+    <div class="center playerLabel">Room: <span id="roomCode"></span></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="flex:1;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">
+        <div class="small">You</div>
+        <div id="youName" style="font-weight:800">Player</div>
+        <div class="small" id="youStatus">Waiting...</div>
+      </div>
+      <div style="flex:1;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">
+        <div class="small">Opponent</div>
+        <div id="opName" style="font-weight:800">—</div>
+        <div class="small" id="opStatus">—</div>
+      </div>
+    </div>
+
+    <div class="log" id="gameLog">Waiting for both players...</div>
+
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="attackBtn" class="btn">Strike ⚔️</button>
+      <button id="skillBtn" class="btn">Skill 🏹</button>
+      <button id="trickBtn" class="btn">Trick 🪄</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="leaveBtn" class="btn" style="background:#8b8b8b">Leave Room</button>
+      <button id="restartBtn" class="btn" style="background:#6fb3ff">Restart Match</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script>
-/* Game logic + animations + WebAudio simple SFX */
-(() => {
-  // state
-  const state = {
-    mary: {hp:100, max:100},
-    marcus: {hp:100, max:100},
-    busy:false
+/*
+  IMPORTANT: After you create a Firebase project, copy the Web SDK config object
+  from the Firebase console and paste it into the firebaseConfig variable below.
+  Example (replace with your values):
+  const firebaseConfig = {
+    apiKey: "AIza...",
+    authDomain: "your-project.firebaseapp.com",
+    databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+    projectId: "your-project-id",
+    storageBucket: "your-project-id.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcdef"
   };
+*/
+let firebaseConfig = {
+  // <<--- PASTE YOUR FIREBASE CONFIG OBJECT HERE
+};
 
-  // DOM
-  const logEl = document.getElementById('log');
-  const maryEl = document.getElementById('mary');
-  const marcusEl = document.getElementById('marcus');
-  const maryHpFill = document.getElementById('maryHpFill');
-  const marcusHpFill = document.getElementById('marcusHpFill');
-  const maryHpText = document.getElementById('maryHpText');
-  const marcusHpText = document.getElementById('marcusHpText');
+// ----------------- Basic multiplayer logic using Realtime Database -----------------
+// This is minimal code to get two players into a room and exchange moves.
+// Security note: For quick testing you can set Realtime Database rules to allow reads/writes.
+// See README.txt for exact rules and safer suggestions.
+let app, db, auth;
+let localPlayerId = null;
+let roomRef = null;
+let roomCodeGlobal = null;
 
-  const attackBtn = document.getElementById('attackBtn');
-  const trickBtn = document.getElementById('trickBtn');
-  const skillBtn = document.getElementById('skillBtn');
-  const restartBtn = document.getElementById('restartBtn');
-
-  // audio using WebAudio (no files)
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let audioCtx = null;
-  function ensureAudio() {
-    if (!audioCtx) audioCtx = new AudioCtx();
-  }
-  function sfx(frequency=440, duration=0.12, type='sine', gain=0.14){
-    try {
-      ensureAudio();
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type = type; o.frequency.value = frequency;
-      g.gain.value = gain;
-      o.connect(g); g.connect(audioCtx.destination);
-      o.start();
-      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-      setTimeout(()=>{ try{o.stop()}catch(e){} }, duration*1000+30);
-    } catch(e){}
-  }
-
-  // helpers
-  function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-  function writeLog(text){
-    logEl.textContent = text;
-  }
-  function setHpUI(which){
-    if (which === 'mary') {
-      const p = state.mary.hp / state.mary.max * 100;
-      maryHpFill.style.width = p + '%';
-      maryHpText.textContent = `HP: ${state.mary.hp} / ${state.mary.max}`;
-    } else {
-      const p = state.marcus.hp / state.marcus.max * 100;
-      marcusHpFill.style.width = p + '%';
-      marcusHpText.textContent = `HP: ${state.marcus.hp} / ${state.marcus.max}`;
-    }
-  }
-  function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
-  function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
-
-  function disableButtons(val){
-    attackBtn.disabled = val;
-    trickBtn.disabled = val;
-    skillBtn.disabled = val;
-    if (val) {
-      attackBtn.style.opacity=0.5; trickBtn.style.opacity=0.5; skillBtn.style.opacity=0.5;
-    } else {
-      attackBtn.style.opacity=1; trickBtn.style.opacity=1; skillBtn.style.opacity=1;
-    }
-  }
-
-  // game actions
-  async function playerAttack(){
-    if (state.busy) return;
-    state.busy = true; disableButtons(true);
-    writeLog("Mary strikes with a swift blow!");
-    sfx(560,0.09,'sawtooth',0.14);
-    shake(marcusEl); flash(marcusEl);
-
-    await sleep(420);
-    const damage = rand(14,26);
-    state.marcus.hp = Math.max(0, state.marcus.hp - damage);
-    setHpUI('marcus');
-    writeLog(`Mary hits Marcus for ${damage} damage.`);
-
-    await sleep(420);
-    if (checkEnd()) { state.busy=false; disableButtons(false); return; }
-
-    // Marcus turn
-    await enemyTurn();
-    state.busy=false; disableButtons(false);
-  }
-
-  async function playerTrick(){
-    if (state.busy) return;
-    state.busy = true; disableButtons(true);
-    writeLog("Mary attempts a tricky feint...");
-    sfx(800,0.08,'triangle',0.09);
-    shake(maryEl);
-    await sleep(500);
-    const success = Math.random() < 0.62; // favorable chance
-    if (success){
-      writeLog("The trick works! Marcus is exposed — Mary grabs the Amulet!");
-      sfx(1200,0.16,'sine',0.16);
-      flash(marcusEl);
-      // instant victory
-      state.marcus.hp = 0; setHpUI('marcus');
-      endGame(true, "Trick succeeded — Mary wins!");
-    } else {
-      writeLog("Marcus sees through it and counterattacks!");
-      sfx(260,0.08,'sawtooth',0.14);
-      await sleep(360);
-      await enemyTurn();
-      if (!checkEnd()) {
-        writeLog("Mary's trick failed. The duel continues.");
-      }
-    }
-    state.busy=false; disableButtons(false);
-  }
-
-  async function playerSkillContest(){
-    if (state.busy) return;
-    state.busy = true; disableButtons(true);
-    writeLog("Skill contest! Archery — both shoot three arrows...");
-    sfx(640,0.09,'square',0.12);
-    await sleep(600);
-    const maryScore = rand(10,30);
-    const marcusScore = rand(10,30);
-    writeLog(`Results — Mary: ${maryScore} | Marcus: ${marcusScore}`);
-    if (maryScore >= marcusScore) {
-      writeLog("Mary outshoots Marcus and claims the Amulet!");
-      sfx(1200,0.16,'sine',0.16);
-      endGame(true, "Skill victory — Mary wins!");
-    } else {
-      // Marcus deals a hit because he wins
-      const damage = rand(8,18);
-      state.mary.hp = Math.max(0, state.mary.hp - damage);
-      setHpUI('mary');
-      writeLog(`Marcus wins the contest and lands a strike for ${damage} damage.`);
-      sfx(260,0.08,'sawtooth',0.12);
-      await sleep(360);
-      if (!checkEnd()) writeLog("The duel continues...");
-    }
-    state.busy=false; disableButtons(false);
-  }
-
-  async function enemyTurn(){
-    writeLog("Marcus prepares his move...");
-    await sleep(550);
-    // choose between attack (80%) or special (20%)
-    if (Math.random() < 0.78) {
-      sfx(260,0.09,'sawtooth',0.12);
-      shake(maryEl); flash(maryEl);
-      await sleep(220);
-      const damage = rand(10,22);
-      state.mary.hp = Math.max(0, state.mary.hp - damage);
-      setHpUI('mary');
-      writeLog(`Marcus slashes Mary for ${damage} damage.`);
-    } else {
-      // heavy strike
-      sfx(200,0.16,'square',0.16);
-      shake(maryEl); flash(maryEl);
-      await sleep(260);
-      const damage = rand(18,28);
-      state.mary.hp = Math.max(0, state.mary.hp - damage);
-      setHpUI('mary');
-      writeLog(`Marcus unleashes a heavy strike for ${damage} damage!`);
-    }
-    await sleep(180);
-    checkEnd();
-  }
-
-  function checkEnd(){
-    if (state.marcus.hp <= 0){
-      endGame(true, "Marcus is defeated — Mary claims the Amulet!");
-      return true;
-    }
-    if (state.mary.hp <= 0){
-      endGame(false, "Mary fell — Marcus takes the Amulet.");
-      return true;
-    }
+function initFirebase() {
+  if (!firebaseConfig || !firebaseConfig.apiKey) {
+    document.getElementById('lobbyLog').textContent = 'Missing Firebase config — paste it into index.html';
     return false;
   }
+  app = firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  auth = firebase.auth();
+  // anonymous auth (recommended)
+  auth.signInAnonymously().catch(e=>console.warn(e));
+  return true;
+}
 
-  function endGame(victory, reason){
-    flash(document.querySelector('.arena'));
-    sfx(victory ? 1200 : 180, 0.18, victory ? 'sine' : 'sawtooth', 0.16);
-    writeLog(reason);
-    disableButtons(true);
-  }
+function genRoomCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
 
-  // utilities
-  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-  // wiring
-  attackBtn.addEventListener('click', playerAttack);
-  trickBtn.addEventListener('click', playerTrick);
-  skillBtn.addEventListener('click', playerSkillContest);
-  restartBtn.addEventListener('click', ()=>{
-    state.mary.hp = state.mary.max;
-    state.marcus.hp = state.marcus.max;
-    setHpUI('mary'); setHpUI('marcus');
-    writeLog("The duel resets. Mary stands ready.");
-    disableButtons(false);
+function createRoom(name){
+  if(!initFirebase()) return;
+  const code = genRoomCode();
+  const path = 'rooms/' + code;
+  const ref = db.ref(path);
+  // room initial data
+  const data = {
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    players: {
+      p1: {name: name, ready: true, lastMove: null, score: 0},
+    },
+    round: 1,
+    started: true
+  };
+  ref.set(data, (err)=>{
+    if(err){ document.getElementById('lobbyLog').textContent = 'Failed to create room: '+err; return; }
+    joinRoom(code, name, true);
   });
+}
 
-  // init UI
-  setHpUI('mary'); setHpUI('marcus');
-  writeLog("The crowd hums with anticipation. Choose Mary’s action.");
-})();
+function joinRoom(code, name, isCreator=false){
+  if(!initFirebase()) return;
+  const path = 'rooms/' + code;
+  const ref = db.ref(path);
+  ref.once('value', snap=>{
+    if(!snap.exists()){ document.getElementById('lobbyLog').textContent = 'Room not found.'; return; }
+    const room = snap.val();
+    // find empty slot p1 or p2
+    let updates = {};
+    if(!room.players || !room.players.p1){
+      updates['players/p1'] = {name:name, ready:true, lastMove:null, score:0};
+    } else if(!room.players.p2){
+      updates['players/p2'] = {name:name, ready:true, lastMove:null, score:0};
+    } else {
+      document.getElementById('lobbyLog').textContent = 'Room full.'; return;
+    }
+    ref.update(updates, ()=>{
+      document.getElementById('lobbyLog').textContent = 'Joined room ' + code;
+      setupRoomListeners(code, name, isCreator);
+    });
+  });
+}
+
+function setupRoomListeners(code, name, isCreator=false){
+  roomCodeGlobal = code;
+  roomRef = db.ref('rooms/' + code);
+  localPlayerId = null;
+  roomRef.on('value', snap=>{
+    const room = snap.val();
+    if(!room) return;
+    // determine player slots and names
+    const p1 = room.players && room.players.p1 ? room.players.p1.name : null;
+    const p2 = room.players && room.players.p2 ? room.players.p2.name : null;
+    // set UI
+    const youName = (p1 === name) ? 'You ('+p1+')' : (p2 === name ? 'You ('+p2+')' : 'You');
+    document.getElementById('youName').textContent = youName;
+    document.getElementById('opName').textContent = (p1 && p2) ? (p1===name? p2 : p1) : 'Waiting...';
+    document.getElementById('roomCode').textContent = code;
+    document.getElementById('lobby').style.display = 'none';
+    document.getElementById('gamePanel').style.display = 'block';
+    updateGameLog(room, name);
+  });
+}
+
+function updateGameLog(room, name){
+  const p1 = room.players && room.players.p1 ? room.players.p1 : null;
+  const p2 = room.players && room.players.p2 ? room.players.p2 : null;
+  let status = '';
+  status += 'Round: ' + (room.round || 1) + ' | ';
+  status += 'Players: ' + (p1? p1.name:'-') + (p2? ' vs ' + p2.name : ' (waiting)') + '\n\n';
+  // show last moves if available
+  if(p1 && p2){
+    const last1 = p1.lastMove ? p1.lastMove : '—';
+    const last2 = p2.lastMove ? p2.lastMove : '—';
+    status += p1.name + ' last move: ' + last1 + '\n' + p2.name + ' last move: ' + last2 + '\n\n';
+    // simple round resolution example: compare lastMove values when both exist
+    if(p1.lastMove && p2.lastMove){
+      const result = resolveMoves(p1.lastMove, p2.lastMove);
+      status += 'Round result: ' + result + '\n';
+    } else {
+      status += 'Waiting for moves...' + '\n';
+    }
+  } else {
+    status += 'Waiting for opponent to join...';
+  }
+  document.getElementById('gameLog').textContent = status;
+}
+
+function resolveMoves(m1, m2){
+  // Reuse simple deterministic resolution: higher numeric value wins;
+  // mapping: strike=3, skill=2, trick=4 (trick auto-wins unless special case)
+  const val = {strike:3, skill:2, trick:4};
+  if(m1 === m2) return 'Draw';
+  if(m1==='trick' && m2!=='trick') return 'Player1 (trick) auto-wins';
+  if(m2==='trick' && m1!=='trick') return 'Player2 (trick) auto-wins';
+  return val[m1] > val[m2] ? 'Player1 wins' : 'Player2 wins';
+}
+
+// player actions
+function sendMove(move){
+  if(!roomRef) return;
+  // read room once to decide whether this player is p1 or p2
+  roomRef.once('value', snap=>{
+    const room = snap.val();
+    if(!room) return;
+    let slot = null;
+    if(room.players && room.players.p1 && room.players.p1.name === document.getElementById('nameInput').value){
+      slot = 'p1';
+    } else if(room.players && room.players.p2 && room.players.p2.name === document.getElementById('nameInput').value){
+      slot = 'p2';
+    } else {
+      // fallback: choose empty or p2
+      slot = room.players && !room.players.p2 ? 'p2' : 'p1';
+    }
+    const updates = {};
+    updates['players/' + slot + '/lastMove'] = move;
+    roomRef.update(updates);
+  });
+}
+
+// UI wiring
+document.getElementById('createBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('nameInput').value.trim() || 'Player';
+  createRoom(name);
+});
+document.getElementById('joinBtn').addEventListener('click', ()=>{
+  const code = document.getElementById('roomInput').value.trim();
+  const name = document.getElementById('nameInput').value.trim() || 'Player';
+  if(!code){ document.getElementById('lobbyLog').textContent = 'Enter a room code to join.'; return; }
+  joinRoom(code, name);
+});
+document.getElementById('attackBtn').addEventListener('click', ()=>sendMove('strike'));
+document.getElementById('skillBtn').addEventListener('click', ()=>sendMove('skill'));
+document.getElementById('trickBtn').addEventListener('click', ()=>sendMove('trick'));
+document.getElementById('leaveBtn').addEventListener('click', ()=>{
+  if(roomRef) roomRef.off();
+  document.getElementById('gamePanel').style.display='none';
+  document.getElementById('lobby').style.display='block';
+  document.getElementById('lobbyLog').textContent='Left room.';
+});
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  if(!roomRef) return;
+  roomRef.update({round:1, 'players/p1/lastMove':null, 'players/p2/lastMove':null, 'players/p1/score':0, 'players/p2/score':0});
+});
+
+// Expose init function to allow manual init after pasting config
+window.initFirebaseWeb = initFirebase;
+
 </script>
+
 </body>
 </html>
